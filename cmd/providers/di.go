@@ -2,6 +2,7 @@ package providers
 
 import (
 	"github.com/andresxlp/backend-twitter/internal/infra/api/router"
+	"github.com/andresxlp/backend-twitter/internal/infra/resources/postgres"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/dig"
 )
@@ -14,6 +15,8 @@ func BuildContainer() *dig.Container {
 	_ = Container.Provide(func() *echo.Echo {
 		return echo.New()
 	})
+
+	_ = Container.Provide(postgres.NewConnection)
 
 	_ = Container.Provide(router.New)
 
