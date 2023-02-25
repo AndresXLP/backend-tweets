@@ -65,7 +65,11 @@ func (repo repository) GetTweets(ctx context.Context, request dto.TweetsRequest)
 		Select("t.id,t.content, t.visible,u.name as created_by").
 		Where("t.visible = true AND t.deleted_at is null").
 		Joins("left join users u on t.created_by = u.id").
-		Limit(limit).Offset(offset).Scan(&tweets).Error
+		Order("t.created_at desc").
+		Limit(limit).
+		Offset(offset).
+		Scan(&tweets).
+		Error
 	if err != nil {
 		return dto.Pagination{}, entity.TweetsWithOwners{}, err
 	}
@@ -76,4 +80,44 @@ func (repo repository) GetTweets(ctx context.Context, request dto.TweetsRequest)
 		Page:       page,
 		Limit:      limit,
 	}, tweets.ToDomainEntitySlice(), nil
+}
+
+func (repo repository) GetTweetByID(ctx context.Context, idTweet int) (entity.Tweets, error) {
+	var modelTweet models.Tweets
+
+	err := repo.db.WithContext(ctx).
+		Table("tweets").
+		Where("id =?", idTweet).
+		Scan(&modelTweet).Error
+	if err != nil {
+		return entity.Tweets{}, err
+	}
+
+	return modelTweet.ToDomainEntitySingle(), nil
+}
+
+func (repo repository) GetTweetByIDAndUserID(ctx context.Context, idTweet, userID int) (entity.Tweets, error) {
+	var modelTweet models.Tweets
+
+	err := repo.db.WithContext(ctx).
+		Table("tweets").
+		Where("id =? AND created_by=? AND deleted_at IS NULL", idTweet, userID).
+		Scan(&modelTweet).Error
+	if err != nil {
+		return entity.Tweets{}, err
+	}
+
+	return modelTweet.ToDomainEntitySingle(), nil
+}
+
+func (repo repository) UpdateTweet(ctx context.Context, tweet models.Tweet) error {
+	err := repo.db.WithContext(ctx).
+		Table("tweets").
+		Where("deleted_at is null").
+		Updates(&tweet).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -26,4 +26,5 @@ func (group tweets) Resource(c *echo.Group) {
 	groupPath := c.Group("/tweets")
 	groupPath.POST("", group.tweetsHandler.CreateTweet, group.userMiddleware.OnlyUsers)
 	groupPath.GET("", group.tweetsHandler.GetTweets)
+	groupPath.PUT("/:id", group.tweetsHandler.UpdateTweet, group.userMiddleware.OnlyUsers)
 }

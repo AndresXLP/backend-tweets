@@ -12,6 +12,7 @@ import (
 type Tweets interface {
 	CreateTweet(cntx echo.Context) error
 	GetTweets(cntx echo.Context) error
+	UpdateTweet(cntx echo.Context) error
 }
 
 type tweets struct {
@@ -25,7 +26,7 @@ func NewTweetsHandler(app app.Tweets) Tweets {
 func (handler *tweets) CreateTweet(cntx echo.Context) error {
 	ctx := cntx.Request().Context()
 
-	tweet := dto.Tweet{}
+	tweet := dto.Tweets{}
 	if err := cntx.Bind(&tweet); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
@@ -56,13 +57,34 @@ func (handler *tweets) GetTweets(cntx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	pagi, err := handler.app.GetTweets(ctx, request)
+	pagination, err := handler.app.GetTweets(ctx, request)
 	if err != nil {
 		return err
 	}
 
 	return cntx.JSON(http.StatusOK, entity.Message{
 		Message: "Tweets load successfully",
-		Data:    pagi,
+		Data:    pagination,
+	})
+}
+
+func (handler *tweets) UpdateTweet(cntx echo.Context) error {
+	ctx := cntx.Request().Context()
+
+	updateRequest := dto.Tweets{}
+	if err := cntx.Bind(&updateRequest); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := updateRequest.Validate(); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := handler.app.UpdateTweet(ctx, updateRequest); err != nil {
+		return err
+	}
+
+	return cntx.JSON(http.StatusOK, entity.MessageSuccess{
+		Message: "Update tweet Successfully",
 	})
 }

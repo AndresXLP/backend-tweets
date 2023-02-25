@@ -1,15 +1,20 @@
 package models
 
 import (
+	"time"
+
 	"github.com/andresxlp/backend-twitter/internal/domain/dto"
 	"github.com/andresxlp/backend-twitter/internal/domain/entity"
 )
 
 type Tweet struct {
-	ID        int    `json:"ID"`
-	Content   string `json:"content"`
-	CreatedBy int    `json:"created_by"`
-	Visible   bool   `json:"visible"`
+	ID        int        `json:"ID"`
+	Content   string     `json:"content"`
+	CreatedBy int        `json:"created_by"`
+	Visible   bool       `json:"visible"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+	DeletedAt *time.Time `json:"deleted_at"`
 }
 
 type Tweets struct {
@@ -19,7 +24,8 @@ type Tweets struct {
 
 type TweetsWithOwner []Tweets
 
-func (t *Tweet) BuildModel(tweet dto.Tweet, userID int) {
+func (t *Tweet) BuildModel(tweet dto.Tweets, userID int) {
+	t.ID = tweet.ID
 	t.Content = tweet.Content
 	t.CreatedBy = userID
 	t.Visible = true
