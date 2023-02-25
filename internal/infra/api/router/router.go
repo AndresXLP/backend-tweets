@@ -9,14 +9,16 @@ import (
 )
 
 type Router struct {
-	server    *echo.Echo
-	userGroup groups.User
+	server       *echo.Echo
+	userGroup    groups.User
+	sessionGroup groups.Session
 }
 
-func New(server *echo.Echo, userGroup groups.User) *Router {
+func New(server *echo.Echo, userGroup groups.User, sessionGroup groups.Session) *Router {
 	return &Router{
 		server,
 		userGroup,
+		sessionGroup,
 	}
 }
 
@@ -30,4 +32,6 @@ func (r *Router) Init() {
 	basePath.GET("/health", handler.HealthCheck)
 
 	r.userGroup.Resource(basePath)
+	r.sessionGroup.Resource(basePath)
+
 }

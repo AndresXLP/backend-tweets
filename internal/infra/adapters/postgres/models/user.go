@@ -2,6 +2,8 @@ package models
 
 import (
 	"github.com/andresxlp/backend-twitter/internal/domain/dto"
+	"github.com/andresxlp/backend-twitter/internal/domain/entity"
+	"github.com/andresxlp/backend-twitter/internal/utils"
 )
 
 type User struct {
@@ -12,7 +14,7 @@ type User struct {
 	Address  string
 	Gender   string
 	Age      int
-	Password string
+	Password []byte
 }
 
 func (u *User) BuildModel(newUser dto.NewUser) {
@@ -22,9 +24,17 @@ func (u *User) BuildModel(newUser dto.NewUser) {
 	u.Address = newUser.Address
 	u.Gender = newUser.Gender
 	u.Age = newUser.Age
-	u.Password = newUser.Password
+	u.Password = utils.HashPassword(newUser.Password)
 }
 
 func (u User) TableName() string {
 	return "users"
+}
+
+func (u *User) ToDomainEntity() entity.User {
+	return entity.User{
+		ID:       u.ID,
+		Email:    u.Email,
+		Password: u.Password,
+	}
 }

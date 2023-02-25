@@ -15,6 +15,7 @@ type Config struct {
 	DbUser     string `required:"true" split_words:"true"`
 	DbPassword string `required:"true" split_words:"true"`
 	DbName     string `required:"true" split_words:"true"`
+	SecretJWT  string `required:"true" split_words:"true"`
 }
 
 var (
