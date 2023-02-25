@@ -13,7 +13,7 @@ type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) repo.User {
+func NewRepository(db *gorm.DB) repo.Repository {
 	return repository{db}
 }
 
@@ -37,4 +37,14 @@ func (repo repository) GetUser(ctx context.Context, email string) (entity.User, 
 	}
 
 	return userDb.ToDomainEntity(), nil
+}
+
+func (repo repository) CreateTweet(ctx context.Context, tweetData models.Tweets) error {
+	err := repo.db.WithContext(ctx).
+		Create(&tweetData).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

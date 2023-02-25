@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/andresxlp/backend-twitter/config"
@@ -13,6 +14,8 @@ type customClaim struct {
 	jwt.StandardClaims
 }
 
+var mySecret = []byte(config.Environments().SecretJWT)
+
 func GenerateToken(data string) (string, error) {
 	claim := customClaim{
 		Email: data,
@@ -22,7 +25,6 @@ func GenerateToken(data string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claim)
-	mySecret := []byte(config.Environments().SecretJWT)
 	tokenString, err := token.SignedString(mySecret)
 	if err != nil {
 		log.Error(err.Error())
@@ -30,4 +32,24 @@ func GenerateToken(data string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func ValidateToken(receivedToken string) (string, error) {
+	token, err := jwt.Parse(receivedToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+		}
+
+		return mySecret, nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return claims["email"].(string), nil
+	}
+
+	return "", fmt.Errorf("token invalid")
 }

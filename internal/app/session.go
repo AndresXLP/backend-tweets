@@ -15,10 +15,10 @@ type Session interface {
 }
 
 type session struct {
-	sessionRepo repo.User
+	sessionRepo repo.Repository
 }
 
-func NewSessionApp(sessionRepo repo.User) Session {
+func NewSessionApp(sessionRepo repo.Repository) Session {
 	return &session{sessionRepo}
 }
 

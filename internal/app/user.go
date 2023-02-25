@@ -15,10 +15,10 @@ type User interface {
 }
 
 type user struct {
-	userRepo repo.User
+	userRepo repo.Repository
 }
 
-func NewUserApp(userRepo repo.User) User {
+func NewUserApp(userRepo repo.Repository) User {
 	return &user{userRepo}
 }
 
