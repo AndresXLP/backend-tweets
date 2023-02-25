@@ -19,6 +19,7 @@ const (
 	methodCreateTweet = "CreateTweet"
 	methodGetTweets   = "GetTweets"
 	methodUpdateTweet = "UpdateTweet"
+	methodDeleteTweet = "DeleteTweet"
 )
 
 var (
@@ -181,4 +182,44 @@ func (suite *tweetsSuiteTest) TestUpdateTweet_WhenSuccess() {
 		Return(nil)
 
 	suite.NoError(suite.underTest.UpdateTweet(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestDeleteTweet_WhenBindFail() {
+	controller := SetupControllerCase(http.MethodDelete, pathTweets, nil)
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	controller.context.SetParamNames("id")
+	controller.context.SetParamValues("A1")
+
+	suite.Error(suite.underTest.DeleteTweet(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestDeleteTweet_WhenValidateFail() {
+	controller := SetupControllerCase(http.MethodPut, pathTweets, nil)
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	suite.Error(suite.underTest.DeleteTweet(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestDeleteTweet_WhenFail() {
+	controller := SetupControllerCase(http.MethodPut, pathTweets, nil)
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	controller.context.SetParamNames("id")
+	controller.context.SetParamValues("1")
+
+	suite.app.Mock.On(methodDeleteTweet, ctxTest, 1).
+		Return(errExpected)
+
+	suite.Error(suite.underTest.DeleteTweet(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestDeleteTweet_WhenSuccess() {
+	controller := SetupControllerCase(http.MethodPut, pathTweets, nil)
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+	controller.context.SetParamNames("id")
+	controller.context.SetParamValues("1")
+
+	suite.app.Mock.On(methodDeleteTweet, ctxTest, 1).
+		Return(nil)
+
+	suite.NoError(suite.underTest.DeleteTweet(controller.context))
 }
