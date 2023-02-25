@@ -8,6 +8,7 @@ import (
 	"github.com/andresxlp/backend-twitter/internal/infra/api/router"
 	"github.com/andresxlp/backend-twitter/internal/infra/api/router/groups"
 	"github.com/andresxlp/backend-twitter/internal/infra/resources/postgres"
+	"github.com/andresxlp/backend-twitter/internal/utils"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/dig"
 )
@@ -22,6 +23,7 @@ func BuildContainer() *dig.Container {
 	})
 
 	_ = Container.Provide(postgres.NewConnection)
+	_ = Container.Provide(utils.NewJWTUtils)
 
 	_ = Container.Provide(router.New)
 	_ = Container.Provide(middleware.NewUserMiddleware)

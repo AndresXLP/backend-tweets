@@ -9,6 +9,17 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
+type JWT interface {
+	GenerateToken(data string) (string, error)
+	ValidateToken(receivedToken string) (string, error)
+}
+
+type jwtUtils struct{}
+
+func NewJWTUtils() JWT {
+	return &jwtUtils{}
+}
+
 type customClaim struct {
 	Email string `json:"email"`
 	jwt.StandardClaims
@@ -16,7 +27,7 @@ type customClaim struct {
 
 var mySecret = []byte(config.Environments().SecretJWT)
 
-func GenerateToken(data string) (string, error) {
+func (u *jwtUtils) GenerateToken(data string) (string, error) {
 	claim := customClaim{
 		Email: data,
 		StandardClaims: jwt.StandardClaims{
@@ -34,7 +45,7 @@ func GenerateToken(data string) (string, error) {
 	return tokenString, nil
 }
 
-func ValidateToken(receivedToken string) (string, error) {
+func (u *jwtUtils) ValidateToken(receivedToken string) (string, error) {
 	token, err := jwt.Parse(receivedToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])

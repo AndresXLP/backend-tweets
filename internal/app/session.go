@@ -16,10 +16,14 @@ type Session interface {
 
 type session struct {
 	sessionRepo repo.Repository
+	jwt         utils.JWT
 }
 
-func NewSessionApp(sessionRepo repo.Repository) Session {
-	return &session{sessionRepo}
+func NewSessionApp(sessionRepo repo.Repository, jwt utils.JWT) Session {
+	return &session{
+		sessionRepo,
+		jwt,
+	}
 }
 
 func (app *session) Login(ctx context.Context, loginData dto.Login) (string, error) {
@@ -36,7 +40,7 @@ func (app *session) Login(ctx context.Context, loginData dto.Login) (string, err
 		return "", echo.NewHTTPError(http.StatusNotFound, "Wrong Email or Password")
 	}
 
-	token, err := utils.GenerateToken(entityUser.Email)
+	token, err := app.jwt.GenerateToken(entityUser.Email)
 	if err != nil {
 		return "", echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
