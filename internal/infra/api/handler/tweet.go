@@ -11,6 +11,7 @@ import (
 
 type Tweets interface {
 	CreateTweet(cntx echo.Context) error
+	GetTweets(cntx echo.Context) error
 }
 
 type tweets struct {
@@ -40,5 +41,28 @@ func (handler *tweets) CreateTweet(cntx echo.Context) error {
 	return cntx.JSON(http.StatusCreated, entity.Message{
 		Message: "Tweet Created Successfully",
 		Data:    tweet.Content,
+	})
+}
+
+func (handler *tweets) GetTweets(cntx echo.Context) error {
+	ctx := cntx.Request().Context()
+
+	request := dto.TweetsRequest{}
+	if err := cntx.Bind(&request); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := request.Validate(); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	pagi, err := handler.app.GetTweets(ctx, request)
+	if err != nil {
+		return err
+	}
+
+	return cntx.JSON(http.StatusOK, entity.Message{
+		Message: "Tweets load successfully",
+		Data:    pagi,
 	})
 }

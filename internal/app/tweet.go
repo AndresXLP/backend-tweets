@@ -12,6 +12,7 @@ import (
 
 type Tweets interface {
 	CreateTweet(ctx context.Context, tweetData dto.Tweet) error
+	GetTweets(ctx context.Context, request dto.TweetsRequest) (dto.Pagination, error)
 }
 
 type tweets struct {
@@ -25,7 +26,7 @@ func NewTweetsApp(tweetRepo repo.Repository) Tweets {
 func (app *tweets) CreateTweet(ctx context.Context, tweetData dto.Tweet) error {
 	userID := ctx.Value("userID").(int)
 
-	var tweetModel models.Tweets
+	var tweetModel models.Tweet
 
 	tweetModel.BuildModel(tweetData, userID)
 	if err := app.tweetRepo.CreateTweet(ctx, tweetModel); err != nil {
@@ -33,4 +34,15 @@ func (app *tweets) CreateTweet(ctx context.Context, tweetData dto.Tweet) error {
 	}
 
 	return nil
+}
+
+func (app *tweets) GetTweets(ctx context.Context, request dto.TweetsRequest) (dto.Pagination, error) {
+	pagination, entityTweets, err := app.tweetRepo.GetTweets(ctx, request)
+	if err != nil {
+		return dto.Pagination{}, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	pagination.Rows = entityTweets.ToDomainDTOSlice()
+
+	return pagination, nil
 }
