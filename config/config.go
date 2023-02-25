@@ -19,12 +19,12 @@ type Config struct {
 }
 
 var (
-	once sync.Once
+	Once sync.Once
 	Cfg  Config
 )
 
 func Environments() Config {
-	once.Do(func() {
+	Once.Do(func() {
 		if err := envconfig.Process("", &Cfg); err != nil {
 			log.Panicf("Error parsing environment vars %#v", err)
 		}
