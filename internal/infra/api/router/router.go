@@ -12,13 +12,15 @@ type Router struct {
 	server       *echo.Echo
 	userGroup    groups.User
 	sessionGroup groups.Session
+	tweetsGroup  groups.Tweets
 }
 
-func New(server *echo.Echo, userGroup groups.User, sessionGroup groups.Session) *Router {
+func New(server *echo.Echo, userGroup groups.User, sessionGroup groups.Session, tweetsGroup groups.Tweets) *Router {
 	return &Router{
 		server,
 		userGroup,
 		sessionGroup,
+		tweetsGroup,
 	}
 }
 
@@ -33,5 +35,5 @@ func (r *Router) Init() {
 
 	r.userGroup.Resource(basePath)
 	r.sessionGroup.Resource(basePath)
-
+	r.tweetsGroup.Resource(basePath)
 }

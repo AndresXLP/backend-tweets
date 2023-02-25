@@ -7,7 +7,8 @@ import (
 	"github.com/andresxlp/backend-twitter/internal/infra/adapters/postgres/models"
 )
 
-type User interface {
+type Repository interface {
 	CreateUser(ctx context.Context, newUser models.User) error
 	GetUser(ctx context.Context, email string) (entity.User, error)
+	CreateTweet(ctx context.Context, tweetData models.Tweets) error
 }
