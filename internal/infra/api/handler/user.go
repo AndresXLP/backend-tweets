@@ -34,10 +34,11 @@ func (handler *user) CreateUser(cntx echo.Context) error {
 	}
 
 	if err := handler.app.CreateUser(ctx, newUser); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		return err
 	}
+
 	return cntx.JSON(http.StatusCreated, entity.Message{
 		Message: "User Created Successfully",
-		Data:    nil,
+		Data:    newUser.Email,
 	})
 }

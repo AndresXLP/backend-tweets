@@ -25,10 +25,13 @@ func BuildContainer() *dig.Container {
 	_ = Container.Provide(router.New)
 
 	_ = Container.Provide(groups.NewUserGroup)
+	_ = Container.Provide(groups.NewSessionGroup)
 
 	_ = Container.Provide(handler.NewUserHandler)
+	_ = Container.Provide(handler.NewSessionHandler)
 
 	_ = Container.Provide(app.NewUserApp)
+	_ = Container.Provide(app.NewSessionApp)
 
 	_ = Container.Provide(repo.NewRepository)
 
