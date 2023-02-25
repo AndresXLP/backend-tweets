@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/andresxlp/backend-twitter/internal/domain/dto"
@@ -16,6 +17,7 @@ import (
 const (
 	pathTweets        = "/api/tweets"
 	methodCreateTweet = "CreateTweet"
+	methodGetTweets   = "GetTweets"
 )
 
 var (
@@ -85,4 +87,55 @@ func (suite *tweetsSuiteTest) TestCreateTweet_WhenSuccess() {
 		Return(nil)
 
 	suite.NoError(suite.underTest.CreateTweet(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestGetTweets_WhenBindFail() {
+	q := make(url.Values)
+	q.Set("page", "1A")
+	controller := SetupControllerCase(http.MethodGet, pathTweets+"/?"+q.Encode(), nil)
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	suite.Error(suite.underTest.GetTweets(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestGetTweets_WhenFail() {
+	paginate := dto.Paginate{
+		Limit: 10,
+		Page:  1,
+	}
+
+	request := dto.TweetsRequest{Paginate: paginate}
+
+	q := make(url.Values)
+	q.Set("page", "1")
+	q.Set("limit", "10")
+
+	controller := SetupControllerCase(http.MethodGet, pathTweets+"/?"+q.Encode(), nil)
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	suite.app.Mock.On(methodGetTweets, ctxTest, request).
+		Return(dto.Pagination{}, errExpected)
+
+	suite.Error(suite.underTest.GetTweets(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestGetTweets_WhenSuccess() {
+	paginate := dto.Paginate{
+		Limit: 10,
+		Page:  1,
+	}
+
+	request := dto.TweetsRequest{Paginate: paginate}
+
+	q := make(url.Values)
+	q.Set("page", "1")
+	q.Set("limit", "10")
+
+	controller := SetupControllerCase(http.MethodGet, pathTweets+"/?"+q.Encode(), nil)
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	suite.app.Mock.On(methodGetTweets, ctxTest, request).
+		Return(dto.Pagination{}, nil)
+
+	suite.NoError(suite.underTest.GetTweets(controller.context))
 }

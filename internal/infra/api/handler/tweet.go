@@ -54,9 +54,7 @@ func (handler *tweets) GetTweets(cntx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
-	if err := request.Validate(); err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
-	}
+	request.SetDefault()
 
 	pagination, err := handler.app.GetTweets(ctx, request)
 	if err != nil {

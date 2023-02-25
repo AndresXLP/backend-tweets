@@ -29,9 +29,8 @@ func (t *Tweets) Validate() error {
 	return validate.Struct(t)
 }
 
-func (t *TweetsRequest) Validate() error {
+func (t *TweetsRequest) SetDefault() {
 	_ = conform.Struct(context.Background(), t)
-	return validate.Struct(t)
 }
 
 type DeleteTweet struct {
