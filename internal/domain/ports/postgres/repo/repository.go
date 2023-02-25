@@ -16,4 +16,5 @@ type Repository interface {
 	GetTweetByID(ctx context.Context, idTweet int) (entity.Tweets, error)
 	UpdateTweet(ctx context.Context, tweet models.Tweet) error
 	GetTweetByIDAndUserID(ctx context.Context, idTweet, userID int) (entity.Tweets, error)
+	DeleteTweet(ctx context.Context, tweet models.Tweet) error
 }

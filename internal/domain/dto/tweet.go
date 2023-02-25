@@ -33,3 +33,11 @@ func (t *TweetsRequest) Validate() error {
 	_ = conform.Struct(context.Background(), t)
 	return validate.Struct(t)
 }
+
+type DeleteTweet struct {
+	ID int `param:"id" validate:"required"`
+}
+
+func (d *DeleteTweet) Validate() error {
+	return validate.Struct(d)
+}

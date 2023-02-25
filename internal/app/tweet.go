@@ -20,6 +20,7 @@ type Tweets interface {
 	UpdateTweet(ctx context.Context, updateData dto.Tweets) error
 	GetTweetByID(ctx context.Context, idTweet int) (dto.Tweets, error)
 	GetTweetByIDAndUserID(ctx context.Context, idTweet, userID int) (dto.Tweets, error)
+	DeleteTweet(ctx context.Context, tweetID int) error
 }
 
 type tweets struct {
@@ -99,6 +100,26 @@ func (app *tweets) UpdateTweet(ctx context.Context, updateData dto.Tweets) error
 	var modelTweet models.Tweet
 	modelTweet.BuildModel(updateData, userID)
 	if err = app.tweetRepo.UpdateTweet(ctx, modelTweet); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return nil
+}
+
+func (app *tweets) DeleteTweet(ctx context.Context, tweetID int) error {
+	userID := ctx.Value("userID").(int)
+	entityTweet, err := app.tweetRepo.GetTweetByIDAndUserID(ctx, tweetID, userID)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	if entityTweet.ID == 0 {
+		return echo.NewHTTPError(http.StatusNotFound, TweetNotFound)
+	}
+
+	var deleteTweet models.Tweet
+	deleteTweet.BuildModel(entityTweet.ToDomainDTOSingle(), userID)
+	if err = app.tweetRepo.DeleteTweet(ctx, deleteTweet); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 

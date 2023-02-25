@@ -13,6 +13,7 @@ type Tweets interface {
 	CreateTweet(cntx echo.Context) error
 	GetTweets(cntx echo.Context) error
 	UpdateTweet(cntx echo.Context) error
+	DeleteTweet(cntx echo.Context) error
 }
 
 type tweets struct {
@@ -87,4 +88,26 @@ func (handler *tweets) UpdateTweet(cntx echo.Context) error {
 	return cntx.JSON(http.StatusOK, entity.MessageSuccess{
 		Message: "Update tweet Successfully",
 	})
+}
+
+func (handler *tweets) DeleteTweet(cntx echo.Context) error {
+	ctx := cntx.Request().Context()
+
+	tweetID := dto.DeleteTweet{}
+	if err := cntx.Bind(&tweetID); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := tweetID.Validate(); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+
+	if err := handler.app.DeleteTweet(ctx, tweetID.ID); err != nil {
+		return err
+	}
+
+	return cntx.JSON(http.StatusOK, entity.MessageSuccess{
+		Message: "Tweet Deleted Successfully",
+	})
+
 }
