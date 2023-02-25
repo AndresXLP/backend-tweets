@@ -18,17 +18,18 @@ const (
 	pathTweets        = "/api/tweets"
 	methodCreateTweet = "CreateTweet"
 	methodGetTweets   = "GetTweets"
+	methodUpdateTweet = "UpdateTweet"
 )
 
 var (
-	wrongRequestNewTweet = dto.Tweets{
+	wrongRequestTweet = dto.Tweets{
 		ID:        0,
 		Content:   "",
 		CreatedBy: "",
 		Visible:   false,
 	}
 
-	requestNewTweet = dto.Tweets{
+	requestTweet = dto.Tweets{
 		ID:        0,
 		Content:   "Test",
 		CreatedBy: "",
@@ -60,7 +61,7 @@ func (suite *tweetsSuiteTest) TestCreateTweet_WhenBindFail() {
 }
 
 func (suite *tweetsSuiteTest) TestCreateTweet_WhenValidateFail() {
-	body, _ := json.Marshal(wrongRequestNewTweet)
+	body, _ := json.Marshal(wrongRequestTweet)
 	controller := SetupControllerCase(http.MethodPost, pathTweets, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
@@ -68,22 +69,22 @@ func (suite *tweetsSuiteTest) TestCreateTweet_WhenValidateFail() {
 }
 
 func (suite *tweetsSuiteTest) TestCreateTweet_WhenTokenNoProvided() {
-	body, _ := json.Marshal(requestNewTweet)
+	body, _ := json.Marshal(requestTweet)
 	controller := SetupControllerCase(http.MethodPost, pathTweets, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	suite.app.Mock.On(methodCreateTweet, ctxTest, requestNewTweet).
+	suite.app.Mock.On(methodCreateTweet, ctxTest, requestTweet).
 		Return(errExpected)
 
 	suite.Error(suite.underTest.CreateTweet(controller.context))
 }
 
 func (suite *tweetsSuiteTest) TestCreateTweet_WhenSuccess() {
-	body, _ := json.Marshal(requestNewTweet)
+	body, _ := json.Marshal(requestTweet)
 	controller := SetupControllerCase(http.MethodPost, pathTweets, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
-	suite.app.Mock.On(methodCreateTweet, ctxTest, requestNewTweet).
+	suite.app.Mock.On(methodCreateTweet, ctxTest, requestTweet).
 		Return(nil)
 
 	suite.NoError(suite.underTest.CreateTweet(controller.context))
@@ -138,4 +139,46 @@ func (suite *tweetsSuiteTest) TestGetTweets_WhenSuccess() {
 		Return(dto.Pagination{}, nil)
 
 	suite.NoError(suite.underTest.GetTweets(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestUpdateTweet_WhenBindFail() {
+	body, _ := json.Marshal("")
+
+	controller := SetupControllerCase(http.MethodPut, pathTweets, bytes.NewBuffer(body))
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	suite.Error(suite.underTest.UpdateTweet(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestUpdateTweet_WhenValidateFail() {
+	body, _ := json.Marshal(wrongRequestTweet)
+
+	controller := SetupControllerCase(http.MethodPut, pathTweets, bytes.NewBuffer(body))
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	suite.Error(suite.underTest.UpdateTweet(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestUpdateTweet_WhenFail() {
+	body, _ := json.Marshal(requestTweet)
+
+	controller := SetupControllerCase(http.MethodPut, pathTweets, bytes.NewBuffer(body))
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	suite.app.Mock.On(methodUpdateTweet, ctxTest, requestTweet).
+		Return(errExpected)
+
+	suite.Error(suite.underTest.UpdateTweet(controller.context))
+}
+
+func (suite *tweetsSuiteTest) TestUpdateTweet_WhenSuccess() {
+	body, _ := json.Marshal(requestTweet)
+
+	controller := SetupControllerCase(http.MethodPut, pathTweets, bytes.NewBuffer(body))
+	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+
+	suite.app.Mock.On(methodUpdateTweet, ctxTest, requestTweet).
+		Return(nil)
+
+	suite.NoError(suite.underTest.UpdateTweet(controller.context))
 }
