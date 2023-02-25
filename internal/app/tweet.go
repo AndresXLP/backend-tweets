@@ -98,7 +98,7 @@ func (app *tweets) UpdateTweet(ctx context.Context, updateData dto.Tweets) error
 	originalTweet.Visible = updateData.Visible
 
 	var modelTweet models.Tweet
-	modelTweet.BuildModel(updateData, userID)
+	modelTweet.BuildModel(originalTweet, userID)
 	if err = app.tweetRepo.UpdateTweet(ctx, modelTweet); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

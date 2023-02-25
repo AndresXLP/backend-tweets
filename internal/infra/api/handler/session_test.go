@@ -32,22 +32,22 @@ var (
 	}
 )
 
-type sessionSuiteTest struct {
+type sessionTestSuite struct {
 	suite.Suite
 	app       *mocks.Session
 	underTest handler.Session
 }
 
 func TestSessionSuite(t *testing.T) {
-	suite.Run(t, new(sessionSuiteTest))
+	suite.Run(t, new(sessionTestSuite))
 }
 
-func (suite *sessionSuiteTest) SetupTest() {
+func (suite *sessionTestSuite) SetupTest() {
 	suite.app = &mocks.Session{}
 	suite.underTest = handler.NewSessionHandler(suite.app)
 }
 
-func (suite *sessionSuiteTest) TestLogin_WhenBindFail() {
+func (suite *sessionTestSuite) TestLogin_WhenBindFail() {
 	body, _ := json.Marshal("")
 	controller := SetupControllerCase(http.MethodPost, pathSession, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -55,7 +55,7 @@ func (suite *sessionSuiteTest) TestLogin_WhenBindFail() {
 	suite.Error(suite.underTest.Login(controller.context))
 }
 
-func (suite *sessionSuiteTest) TestLogin_WhenValidateFail() {
+func (suite *sessionTestSuite) TestLogin_WhenValidateFail() {
 	body, _ := json.Marshal(wrongRequestLogin)
 	controller := SetupControllerCase(http.MethodPost, pathSession, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -63,7 +63,7 @@ func (suite *sessionSuiteTest) TestLogin_WhenValidateFail() {
 	suite.Error(suite.underTest.Login(controller.context))
 }
 
-func (suite *sessionSuiteTest) TestLogin_WhenFail() {
+func (suite *sessionTestSuite) TestLogin_WhenFail() {
 	body, _ := json.Marshal(requestLogin)
 	controller := SetupControllerCase(http.MethodPost, pathSession, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -74,7 +74,7 @@ func (suite *sessionSuiteTest) TestLogin_WhenFail() {
 	suite.Error(suite.underTest.Login(controller.context))
 }
 
-func (suite *sessionSuiteTest) TestLogin_WhenSuccess() {
+func (suite *sessionTestSuite) TestLogin_WhenSuccess() {
 	body, _ := json.Marshal(requestLogin)
 	controller := SetupControllerCase(http.MethodPost, pathSession, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)

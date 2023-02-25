@@ -6,7 +6,7 @@ type Tweets struct {
 	ID        int
 	Content   string
 	CreatedBy string
-	Visible   bool
+	Visible   *bool
 }
 
 type TweetsWithOwners []Tweets

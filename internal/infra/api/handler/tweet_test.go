@@ -23,37 +23,38 @@ const (
 )
 
 var (
+	visibility        = true
 	wrongRequestTweet = dto.Tweets{
 		ID:        0,
 		Content:   "",
 		CreatedBy: "",
-		Visible:   false,
+		Visible:   &visibility,
 	}
 
 	requestTweet = dto.Tweets{
 		ID:        0,
 		Content:   "Test",
 		CreatedBy: "",
-		Visible:   true,
+		Visible:   &visibility,
 	}
 )
 
-type tweetsSuiteTest struct {
+type tweetsTestSuite struct {
 	suite.Suite
 	app       *mocks.Tweets
 	underTest handler.Tweets
 }
 
 func TestTweetSuite(t *testing.T) {
-	suite.Run(t, new(tweetsSuiteTest))
+	suite.Run(t, new(tweetsTestSuite))
 }
 
-func (suite *tweetsSuiteTest) SetupTest() {
+func (suite *tweetsTestSuite) SetupTest() {
 	suite.app = &mocks.Tweets{}
 	suite.underTest = handler.NewTweetsHandler(suite.app)
 }
 
-func (suite *tweetsSuiteTest) TestCreateTweet_WhenBindFail() {
+func (suite *tweetsTestSuite) TestCreateTweet_WhenBindFail() {
 	body, _ := json.Marshal("")
 	controller := SetupControllerCase(http.MethodPost, pathTweets, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -61,7 +62,7 @@ func (suite *tweetsSuiteTest) TestCreateTweet_WhenBindFail() {
 	suite.Error(suite.underTest.CreateTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestCreateTweet_WhenValidateFail() {
+func (suite *tweetsTestSuite) TestCreateTweet_WhenValidateFail() {
 	body, _ := json.Marshal(wrongRequestTweet)
 	controller := SetupControllerCase(http.MethodPost, pathTweets, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -69,7 +70,7 @@ func (suite *tweetsSuiteTest) TestCreateTweet_WhenValidateFail() {
 	suite.Error(suite.underTest.CreateTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestCreateTweet_WhenTokenNoProvided() {
+func (suite *tweetsTestSuite) TestCreateTweet_WhenTokenNoProvided() {
 	body, _ := json.Marshal(requestTweet)
 	controller := SetupControllerCase(http.MethodPost, pathTweets, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -80,7 +81,7 @@ func (suite *tweetsSuiteTest) TestCreateTweet_WhenTokenNoProvided() {
 	suite.Error(suite.underTest.CreateTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestCreateTweet_WhenSuccess() {
+func (suite *tweetsTestSuite) TestCreateTweet_WhenSuccess() {
 	body, _ := json.Marshal(requestTweet)
 	controller := SetupControllerCase(http.MethodPost, pathTweets, bytes.NewBuffer(body))
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
@@ -91,7 +92,7 @@ func (suite *tweetsSuiteTest) TestCreateTweet_WhenSuccess() {
 	suite.NoError(suite.underTest.CreateTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestGetTweets_WhenBindFail() {
+func (suite *tweetsTestSuite) TestGetTweets_WhenBindFail() {
 	q := make(url.Values)
 	q.Set("page", "1A")
 	controller := SetupControllerCase(http.MethodGet, pathTweets+"/?"+q.Encode(), nil)
@@ -100,7 +101,7 @@ func (suite *tweetsSuiteTest) TestGetTweets_WhenBindFail() {
 	suite.Error(suite.underTest.GetTweets(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestGetTweets_WhenFail() {
+func (suite *tweetsTestSuite) TestGetTweets_WhenFail() {
 	paginate := dto.Paginate{
 		Limit: 10,
 		Page:  1,
@@ -121,7 +122,7 @@ func (suite *tweetsSuiteTest) TestGetTweets_WhenFail() {
 	suite.Error(suite.underTest.GetTweets(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestGetTweets_WhenSuccess() {
+func (suite *tweetsTestSuite) TestGetTweets_WhenSuccess() {
 	paginate := dto.Paginate{
 		Limit: 10,
 		Page:  1,
@@ -142,7 +143,7 @@ func (suite *tweetsSuiteTest) TestGetTweets_WhenSuccess() {
 	suite.NoError(suite.underTest.GetTweets(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestUpdateTweet_WhenBindFail() {
+func (suite *tweetsTestSuite) TestUpdateTweet_WhenBindFail() {
 	body, _ := json.Marshal("")
 
 	controller := SetupControllerCase(http.MethodPut, pathTweets, bytes.NewBuffer(body))
@@ -151,7 +152,7 @@ func (suite *tweetsSuiteTest) TestUpdateTweet_WhenBindFail() {
 	suite.Error(suite.underTest.UpdateTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestUpdateTweet_WhenValidateFail() {
+func (suite *tweetsTestSuite) TestUpdateTweet_WhenValidateFail() {
 	body, _ := json.Marshal(wrongRequestTweet)
 
 	controller := SetupControllerCase(http.MethodPut, pathTweets, bytes.NewBuffer(body))
@@ -160,7 +161,7 @@ func (suite *tweetsSuiteTest) TestUpdateTweet_WhenValidateFail() {
 	suite.Error(suite.underTest.UpdateTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestUpdateTweet_WhenFail() {
+func (suite *tweetsTestSuite) TestUpdateTweet_WhenFail() {
 	body, _ := json.Marshal(requestTweet)
 
 	controller := SetupControllerCase(http.MethodPut, pathTweets, bytes.NewBuffer(body))
@@ -172,7 +173,7 @@ func (suite *tweetsSuiteTest) TestUpdateTweet_WhenFail() {
 	suite.Error(suite.underTest.UpdateTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestUpdateTweet_WhenSuccess() {
+func (suite *tweetsTestSuite) TestUpdateTweet_WhenSuccess() {
 	body, _ := json.Marshal(requestTweet)
 
 	controller := SetupControllerCase(http.MethodPut, pathTweets, bytes.NewBuffer(body))
@@ -184,7 +185,7 @@ func (suite *tweetsSuiteTest) TestUpdateTweet_WhenSuccess() {
 	suite.NoError(suite.underTest.UpdateTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestDeleteTweet_WhenBindFail() {
+func (suite *tweetsTestSuite) TestDeleteTweet_WhenBindFail() {
 	controller := SetupControllerCase(http.MethodDelete, pathTweets, nil)
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	controller.context.SetParamNames("id")
@@ -193,14 +194,14 @@ func (suite *tweetsSuiteTest) TestDeleteTweet_WhenBindFail() {
 	suite.Error(suite.underTest.DeleteTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestDeleteTweet_WhenValidateFail() {
+func (suite *tweetsTestSuite) TestDeleteTweet_WhenValidateFail() {
 	controller := SetupControllerCase(http.MethodPut, pathTweets, nil)
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 
 	suite.Error(suite.underTest.DeleteTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestDeleteTweet_WhenFail() {
+func (suite *tweetsTestSuite) TestDeleteTweet_WhenFail() {
 	controller := SetupControllerCase(http.MethodPut, pathTweets, nil)
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	controller.context.SetParamNames("id")
@@ -212,7 +213,7 @@ func (suite *tweetsSuiteTest) TestDeleteTweet_WhenFail() {
 	suite.Error(suite.underTest.DeleteTweet(controller.context))
 }
 
-func (suite *tweetsSuiteTest) TestDeleteTweet_WhenSuccess() {
+func (suite *tweetsTestSuite) TestDeleteTweet_WhenSuccess() {
 	controller := SetupControllerCase(http.MethodPut, pathTweets, nil)
 	controller.Req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	controller.context.SetParamNames("id")

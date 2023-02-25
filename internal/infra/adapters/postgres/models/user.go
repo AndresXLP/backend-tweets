@@ -3,7 +3,6 @@ package models
 import (
 	"github.com/andresxlp/backend-twitter/internal/domain/dto"
 	"github.com/andresxlp/backend-twitter/internal/domain/entity"
-	"github.com/andresxlp/backend-twitter/internal/utils"
 )
 
 type User struct {
@@ -24,7 +23,7 @@ func (u *User) BuildModel(newUser dto.NewUser) {
 	u.Address = newUser.Address
 	u.Gender = newUser.Gender
 	u.Age = newUser.Age
-	u.Password = utils.HashPassword(newUser.Password)
+	u.Password = []byte(newUser.Password)
 }
 
 func (u User) TableName() string {
