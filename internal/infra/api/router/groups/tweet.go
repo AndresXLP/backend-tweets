@@ -24,5 +24,6 @@ func NewTweetsGroup(tweetsHand handler.Tweets, userMiddleware middleware.UserMid
 
 func (group tweets) Resource(c *echo.Group) {
 	groupPath := c.Group("/tweets")
-	groupPath.POST("/", group.tweetsHandler.CreateTweet, group.userMiddleware.OnlyUsers)
+	groupPath.POST("", group.tweetsHandler.CreateTweet, group.userMiddleware.OnlyUsers)
+	groupPath.GET("", group.tweetsHandler.GetTweets)
 }
