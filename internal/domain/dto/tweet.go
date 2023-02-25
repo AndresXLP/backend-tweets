@@ -8,15 +8,11 @@ import (
 
 var conform = modifiers.New()
 
-type Tweet struct {
-	Content string `json:"content" validate:"required,max=255"`
-}
-
 type Tweets struct {
-	ID        int    `json:"id"`
-	Content   string `json:"content"`
+	ID        int    `json:"id" param:"id"`
+	Content   string `json:"content" validate:"required"`
 	CreatedBy string `json:"created_by"`
-	Visible   bool   `json:"visible"`
+	Visible   bool   `json:"visible" validate:"required,boolean"`
 }
 
 type TweetsWithOwner []Tweets
@@ -29,7 +25,7 @@ type TweetsRequest struct {
 	Paginate Paginate
 }
 
-func (t *Tweet) Validate() error {
+func (t *Tweets) Validate() error {
 	return validate.Struct(t)
 }
 

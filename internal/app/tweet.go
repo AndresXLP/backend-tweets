@@ -10,9 +10,16 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	TweetNotFound = "tweet not found"
+)
+
 type Tweets interface {
-	CreateTweet(ctx context.Context, tweetData dto.Tweet) error
+	CreateTweet(ctx context.Context, tweetData dto.Tweets) error
 	GetTweets(ctx context.Context, request dto.TweetsRequest) (dto.Pagination, error)
+	UpdateTweet(ctx context.Context, updateData dto.Tweets) error
+	GetTweetByID(ctx context.Context, idTweet int) (dto.Tweets, error)
+	GetTweetByIDAndUserID(ctx context.Context, idTweet, userID int) (dto.Tweets, error)
 }
 
 type tweets struct {
@@ -23,7 +30,7 @@ func NewTweetsApp(tweetRepo repo.Repository) Tweets {
 	return &tweets{tweetRepo}
 }
 
-func (app *tweets) CreateTweet(ctx context.Context, tweetData dto.Tweet) error {
+func (app *tweets) CreateTweet(ctx context.Context, tweetData dto.Tweets) error {
 	userID := ctx.Value("userID").(int)
 
 	var tweetModel models.Tweet
@@ -45,4 +52,55 @@ func (app *tweets) GetTweets(ctx context.Context, request dto.TweetsRequest) (dt
 	pagination.Rows = entityTweets.ToDomainDTOSlice()
 
 	return pagination, nil
+}
+
+func (app *tweets) GetTweetByID(ctx context.Context, idTweet int) (dto.Tweets, error) {
+	entityTweet, err := app.tweetRepo.GetTweetByID(ctx, idTweet)
+	if err != nil {
+		return dto.Tweets{}, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	if entityTweet.ID == 0 {
+		return dto.Tweets{}, echo.NewHTTPError(http.StatusNotFound, TweetNotFound)
+	}
+
+	return entityTweet.ToDomainDTOSingle(), nil
+}
+
+func (app *tweets) GetTweetByIDAndUserID(ctx context.Context, idTweet, userID int) (dto.Tweets, error) {
+	entityTweet, err := app.tweetRepo.GetTweetByIDAndUserID(ctx, idTweet, userID)
+	if err != nil {
+		return dto.Tweets{}, echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	if entityTweet.ID == 0 {
+		return dto.Tweets{}, echo.NewHTTPError(http.StatusNotFound, TweetNotFound)
+	}
+
+	return entityTweet.ToDomainDTOSingle(), nil
+}
+
+func (app *tweets) UpdateTweet(ctx context.Context, updateData dto.Tweets) error {
+	userID := ctx.Value("userID").(int)
+
+	originalTweet, err := app.GetTweetByIDAndUserID(ctx, updateData.ID, userID)
+	if err != nil {
+		return err
+	}
+
+	if originalTweet.ID == 0 {
+		return echo.NewHTTPError(http.StatusNotFound, TweetNotFound)
+	}
+
+	originalTweet.Content = updateData.Content
+
+	originalTweet.Visible = updateData.Visible
+
+	var modelTweet models.Tweet
+	modelTweet.BuildModel(updateData, userID)
+	if err = app.tweetRepo.UpdateTweet(ctx, modelTweet); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
+	return nil
 }
