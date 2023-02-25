@@ -27,4 +27,5 @@ func (group tweets) Resource(c *echo.Group) {
 	groupPath.POST("", group.tweetsHandler.CreateTweet, group.userMiddleware.OnlyUsers)
 	groupPath.GET("", group.tweetsHandler.GetTweets)
 	groupPath.PUT("/:id", group.tweetsHandler.UpdateTweet, group.userMiddleware.OnlyUsers)
+	groupPath.DELETE("/:id", group.tweetsHandler.DeleteTweet, group.userMiddleware.OnlyUsers)
 }

@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"math"
+	"time"
 
 	"github.com/andresxlp/backend-twitter/internal/domain/dto"
 	"github.com/andresxlp/backend-twitter/internal/domain/entity"
@@ -114,6 +115,20 @@ func (repo repository) UpdateTweet(ctx context.Context, tweet models.Tweet) erro
 	err := repo.db.WithContext(ctx).
 		Table("tweets").
 		Where("deleted_at is null").
+		Updates(&tweet).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (repo repository) DeleteTweet(ctx context.Context, tweet models.Tweet) error {
+	timeNow := time.Now()
+	tweet.DeletedAt = &timeNow
+	err := repo.db.WithContext(ctx).
+		Table("tweets").
+		Where("deleted_at is null ").
 		Updates(&tweet).Error
 	if err != nil {
 		return err
