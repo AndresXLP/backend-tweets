@@ -19,5 +19,5 @@ func NewUserGroup(userHand handler.User) User {
 
 func (group user) Resource(c *echo.Group) {
 	groupPath := c.Group("/users")
-	groupPath.POST("/", group.userHandler.CreateUser)
+	groupPath.POST("", group.userHandler.CreateUser)
 }

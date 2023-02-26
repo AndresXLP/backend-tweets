@@ -24,6 +24,16 @@ func NewTweetsHandler(app app.Tweets) Tweets {
 	return &tweets{app}
 }
 
+//	@Tags			Tweets
+//	@Summary		Create Tweet
+//	@Description	Create a new Tweet
+//	@Produce		json
+//	@Param			Authorization	header		string		true	"Token JWT"
+//	@Param			request			body		dto.Tweets	true	"Request Body"
+//	@Success		201				{object}	entity.Message
+//	@Failure		400
+//	@Failure		500
+//	@Router			/tweets [post]
 func (handler *tweets) CreateTweet(cntx echo.Context) error {
 	ctx := cntx.Request().Context()
 
@@ -46,6 +56,16 @@ func (handler *tweets) CreateTweet(cntx echo.Context) error {
 	})
 }
 
+//	@Tags			Tweets
+//	@Summary		Get All Tweets
+//	@Description	Get all tweets
+//	@Produce		json
+//	@Param			page	query		string	false	"page to find"
+//	@Param			limit	query		string	false	"limit of page"
+//	@Success		200		{object}	dto.Pagination
+//	@Failure		400
+//	@Failure		500
+//	@Router			/tweets [get]
 func (handler *tweets) GetTweets(cntx echo.Context) error {
 	ctx := cntx.Request().Context()
 
@@ -67,6 +87,17 @@ func (handler *tweets) GetTweets(cntx echo.Context) error {
 	})
 }
 
+//	@Tags			Tweets
+//	@Summary		Update Tweet
+//	@Description	Update a  Tweet
+//	@Produce		json
+//	@Param			JWT			Authorization	header		string	true	"Bearer Token"
+//	@Param			tweet_id	path			int			true	"tweet_id"
+//	@Param			request		body			dto.Tweets	true	"request body"
+//	@Success		200			{object}		entity.MessageSuccess
+//	@Failure		400
+//	@Failure		500
+//	@Router			/tweets/{tweet_id} [put]
 func (handler *tweets) UpdateTweet(cntx echo.Context) error {
 	ctx := cntx.Request().Context()
 
@@ -88,6 +119,16 @@ func (handler *tweets) UpdateTweet(cntx echo.Context) error {
 	})
 }
 
+//	@Tags			Tweets
+//	@Summary		Delete Tweet
+//	@Description	Delete a  Tweet
+//	@Produce		json
+//	@Param			JWT			Authorization	header	string	true	"Bearer Token"
+//	@Param			tweet_id	path			string	true	"tweet_id"
+//	@Success		200			{object}		entity.MessageSuccess
+//	@Failure		400
+//	@Failure		500
+//	@Router			/tweets/{tweet_id}  [delete]
 func (handler *tweets) DeleteTweet(cntx echo.Context) error {
 	ctx := cntx.Request().Context()
 

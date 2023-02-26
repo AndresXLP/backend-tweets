@@ -9,9 +9,9 @@ import (
 var conform = modifiers.New()
 
 type Tweets struct {
-	ID        int    `json:"id" param:"id"`
+	ID        int    `json:"id" param:"id" swaggerignore:"true"`
 	Content   string `json:"content" validate:"required"`
-	CreatedBy string `json:"created_by"`
+	CreatedBy string `json:"created_by" swaggerignore:"true"`
 	Visible   *bool  `json:"visible" validate:"boolean"`
 }
 

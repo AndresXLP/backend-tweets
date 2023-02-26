@@ -1,0 +1,263 @@
+basePath: /api
+definitions:
+  dto.Login:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.NewUser:
+    properties:
+      address:
+        type: string
+      age:
+        type: integer
+      email:
+        type: string
+      gender:
+        type: string
+      last_name:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - address
+    - age
+    - email
+    - gender
+    - last_name
+    - name
+    - password
+    type: object
+  dto.Pagination:
+    properties:
+      limit:
+        type: integer
+      page:
+        type: integer
+      rows: {}
+      total_pages:
+        type: integer
+      total_rows:
+        type: integer
+    type: object
+  dto.Tweets:
+    properties:
+      content:
+        type: string
+      visible:
+        type: boolean
+    required:
+    - content
+    type: object
+  entity.Message:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+  entity.MessageSuccess:
+    properties:
+      message:
+        type: string
+    type: object
+  handler.Health:
+    properties:
+      message:
+        type: string
+      status:
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: Backend Basic Tweets with Authentication
+  license:
+    name: Andres Puello
+  title: Tweet Backend
+  version: 1.0.0
+paths:
+  /health:
+    get:
+      description: health service
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/handler.Health'
+      summary: Check if service is active
+      tags:
+      - Health
+  /session/login:
+    post:
+      description: Login
+      parameters:
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Message'
+        "400":
+          description: Bad Request
+        "404":
+          description: Not Found
+      summary: Login User
+      tags:
+      - Login
+  /tweets:
+    get:
+      description: Get all tweets
+      parameters:
+      - description: page to find
+        in: query
+        name: page
+        type: string
+      - description: limit of page
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Pagination'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Get All Tweets
+      tags:
+      - Tweets
+    post:
+      description: Create a new Tweet
+      parameters:
+      - description: Token JWT
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: Request Body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Tweets'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Message'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Create Tweet
+      tags:
+      - Tweets
+  /tweets/{tweet_id}:
+    delete:
+      description: Delete a  Tweet
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: tweet_id
+        in: path
+        name: tweet_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.MessageSuccess'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Delete Tweet
+      tags:
+      - Tweets
+    put:
+      description: Update a  Tweet
+      parameters:
+      - description: Bearer Token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: tweet_id
+        in: path
+        name: tweet_id
+        required: true
+        type: integer
+      - description: request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Tweets'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.MessageSuccess'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Update Tweet
+      tags:
+      - Tweets
+  /users:
+    post:
+      description: Create a new User
+      parameters:
+      - description: tweet_id
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.NewUser'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.MessageSuccess'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Create User
+      tags:
+      - User
+schemes:
+- http
+swagger: "2.0"

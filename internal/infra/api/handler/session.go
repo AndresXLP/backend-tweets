@@ -21,6 +21,15 @@ func NewSessionHandler(app app.Session) Session {
 	return &session{app}
 }
 
+//	@Tags			Login
+//	@Summary		Login User
+//	@Description	Login
+//	@Produce		json
+//	@Param			request	body		dto.Login	true	"Request Body"
+//	@Success		200		{object}	entity.Message
+//	@Failure		400
+//	@Failure		404
+//	@Router			/session/login [post]
 func (handler *session) Login(cntx echo.Context) error {
 	ctx := cntx.Request().Context()
 	loginData := dto.Login{}

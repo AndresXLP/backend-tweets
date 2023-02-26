@@ -56,7 +56,9 @@ func (repo repository) GetTweets(ctx context.Context, request dto.TweetsRequest)
 		tweets models.TweetsWithOwner
 		count  int64
 	)
-	repo.db.WithContext(ctx).Table("tweets").Count(&count)
+	repo.db.WithContext(ctx).Table("tweets").
+		Where("visible = true AND deleted_at is null").
+		Count(&count)
 	limit := request.Paginate.Limit
 	page := request.Paginate.Page
 	offset := (page - 1) * limit
