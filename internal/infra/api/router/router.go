@@ -1,11 +1,13 @@
 package router
 
 import (
+	_ "github.com/andresxlp/backend-twitter/docs"
 	"github.com/andresxlp/backend-twitter/internal/infra/api/handler"
 	"github.com/andresxlp/backend-twitter/internal/infra/api/router/groups"
 	"github.com/labstack/echo/v4/middleware"
 
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
 type Router struct {
@@ -32,6 +34,7 @@ func (r *Router) Init() {
 
 	basePath := r.server.Group("/api")
 	basePath.GET("/health", handler.HealthCheck)
+	basePath.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	r.userGroup.Resource(basePath)
 	r.sessionGroup.Resource(basePath)

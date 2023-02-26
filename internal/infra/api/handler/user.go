@@ -26,6 +26,15 @@ func NewUserHandler(app app.User, bcrypt utils.Bcrypt) User {
 	}
 }
 
+//	@Tags			User
+//	@Summary		Create User
+//	@Description	Create a new User
+//	@Produce		json
+//	@Param			request	body		dto.NewUser	true	"tweet_id"
+//	@Success		200		{object}	entity.Message
+//	@Failure		400
+//	@Failure		500
+//	@Router			/users  [post]
 func (handler *user) CreateUser(cntx echo.Context) error {
 	ctx := cntx.Request().Context()
 

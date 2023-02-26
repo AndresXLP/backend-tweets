@@ -15,6 +15,13 @@ var (
 	serverPort = config.Environments().ServerPort
 )
 
+// main
+//	@title			Tweet Backend
+//	@version		1.0.0
+//	@description	Backend Basic Tweets with Authentication
+//	@license.name	Andres Puello
+//	@BasePath		/api
+//	@schemes		http
 func main() {
 	container := providers.BuildContainer()
 

@@ -30,7 +30,7 @@ func (u *onlyMiddleware) OnlyUsers(next echo.HandlerFunc) echo.HandlerFunc {
 		ctx := cntx.Request().Context()
 
 		token := cntx.Request().Header.Get("Authorization")
-		if token == "" || token[:6] != "Bearer" {
+		if len(token) < 7 || token == "" || token[:6] != "Bearer" {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Token not valid")
 		}
 
