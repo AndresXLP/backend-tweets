@@ -33,11 +33,11 @@ changelog:
 
 .PHONY: docker-build
 docker-build:
-	docker build --build-arg SSH_PRIVATE_KEY="$(cat ~/.ssh/id_rsa)" --no-cache .
+	docker build -t system-tweet .
 
 .PHONY: compose-up
-compose-up:
-	docker-compose up -d
+compose-up: docker-build
+	docker-compose --env-file .env up -d
 
 .PHONY: compose-stop
 compose-stop:
