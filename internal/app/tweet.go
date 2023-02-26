@@ -89,16 +89,12 @@ func (app *tweets) UpdateTweet(ctx context.Context, updateData dto.Tweets) error
 		return err
 	}
 
-	if originalTweet.ID == 0 {
-		return echo.NewHTTPError(http.StatusNotFound, TweetNotFound)
-	}
-
 	originalTweet.Content = updateData.Content
 
 	originalTweet.Visible = updateData.Visible
 
 	var modelTweet models.Tweet
-	modelTweet.BuildModel(updateData, userID)
+	modelTweet.BuildModel(originalTweet, userID)
 	if err = app.tweetRepo.UpdateTweet(ctx, modelTweet); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -108,17 +104,13 @@ func (app *tweets) UpdateTweet(ctx context.Context, updateData dto.Tweets) error
 
 func (app *tweets) DeleteTweet(ctx context.Context, tweetID int) error {
 	userID := ctx.Value("userID").(int)
-	entityTweet, err := app.tweetRepo.GetTweetByIDAndUserID(ctx, tweetID, userID)
+	entityTweet, err := app.GetTweetByIDAndUserID(ctx, tweetID, userID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	if entityTweet.ID == 0 {
-		return echo.NewHTTPError(http.StatusNotFound, TweetNotFound)
-	}
-
 	var deleteTweet models.Tweet
-	deleteTweet.BuildModel(entityTweet.ToDomainDTOSingle(), userID)
+	deleteTweet.BuildModel(entityTweet, userID)
 	if err = app.tweetRepo.DeleteTweet(ctx, deleteTweet); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

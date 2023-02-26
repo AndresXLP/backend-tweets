@@ -6,6 +6,7 @@ import (
 	"github.com/andresxlp/backend-twitter/internal/app"
 	"github.com/andresxlp/backend-twitter/internal/domain/dto"
 	"github.com/andresxlp/backend-twitter/internal/domain/entity"
+	"github.com/andresxlp/backend-twitter/internal/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,11 +15,15 @@ type User interface {
 }
 
 type user struct {
-	app app.User
+	app    app.User
+	bcrypt utils.Bcrypt
 }
 
-func NewUserHandler(app app.User) User {
-	return &user{app}
+func NewUserHandler(app app.User, bcrypt utils.Bcrypt) User {
+	return &user{
+		app,
+		bcrypt,
+	}
 }
 
 func (handler *user) CreateUser(cntx echo.Context) error {
@@ -32,6 +37,8 @@ func (handler *user) CreateUser(cntx echo.Context) error {
 	if err := newUser.Validate(); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
+
+	handler.bcrypt.HashPassword(&newUser.Password)
 
 	if err := handler.app.CreateUser(ctx, newUser); err != nil {
 		return err

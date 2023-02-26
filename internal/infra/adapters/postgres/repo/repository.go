@@ -114,8 +114,9 @@ func (repo repository) GetTweetByIDAndUserID(ctx context.Context, idTweet, userI
 func (repo repository) UpdateTweet(ctx context.Context, tweet models.Tweet) error {
 	err := repo.db.WithContext(ctx).
 		Table("tweets").
-		Where("deleted_at is null").
-		Updates(&tweet).Error
+		Where("id = ? AND deleted_at is null", tweet.ID).
+		Updates(&tweet).
+		Error
 	if err != nil {
 		return err
 	}

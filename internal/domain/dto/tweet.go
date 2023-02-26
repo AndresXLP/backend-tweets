@@ -12,7 +12,7 @@ type Tweets struct {
 	ID        int    `json:"id" param:"id"`
 	Content   string `json:"content" validate:"required"`
 	CreatedBy string `json:"created_by"`
-	Visible   bool   `json:"visible" validate:"required,boolean"`
+	Visible   *bool  `json:"visible" validate:"boolean"`
 }
 
 type TweetsWithOwner []Tweets
@@ -29,9 +29,8 @@ func (t *Tweets) Validate() error {
 	return validate.Struct(t)
 }
 
-func (t *TweetsRequest) Validate() error {
+func (t *TweetsRequest) SetDefault() {
 	_ = conform.Struct(context.Background(), t)
-	return validate.Struct(t)
 }
 
 type DeleteTweet struct {

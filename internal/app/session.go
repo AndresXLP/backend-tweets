@@ -16,10 +16,16 @@ type Session interface {
 
 type session struct {
 	sessionRepo repo.Repository
+	jwt         utils.JWT
+	bcrypt      utils.Bcrypt
 }
 
-func NewSessionApp(sessionRepo repo.Repository) Session {
-	return &session{sessionRepo}
+func NewSessionApp(sessionRepo repo.Repository, jwt utils.JWT, bcrypt utils.Bcrypt) Session {
+	return &session{
+		sessionRepo,
+		jwt,
+		bcrypt,
+	}
 }
 
 func (app *session) Login(ctx context.Context, loginData dto.Login) (string, error) {
@@ -32,11 +38,11 @@ func (app *session) Login(ctx context.Context, loginData dto.Login) (string, err
 		return "", echo.NewHTTPError(http.StatusNotFound, "Wrong Email or Password")
 	}
 
-	if !(utils.ValidatePassword(entityUser.Password, loginData.Password)) {
+	if !(app.bcrypt.ValidatePassword(entityUser.Password, loginData.Password)) {
 		return "", echo.NewHTTPError(http.StatusNotFound, "Wrong Email or Password")
 	}
 
-	token, err := utils.GenerateToken(entityUser.Email)
+	token, err := app.jwt.GenerateToken(entityUser.Email)
 	if err != nil {
 		return "", echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}

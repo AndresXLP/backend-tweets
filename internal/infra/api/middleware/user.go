@@ -15,10 +15,14 @@ type UserMiddleware interface {
 
 type onlyMiddleware struct {
 	repo repo.Repository
+	jwt  utils.JWT
 }
 
-func NewUserMiddleware(repo repo.Repository) UserMiddleware {
-	return &onlyMiddleware{repo}
+func NewUserMiddleware(repo repo.Repository, jwt utils.JWT) UserMiddleware {
+	return &onlyMiddleware{
+		repo,
+		jwt,
+	}
 }
 
 func (u *onlyMiddleware) OnlyUsers(next echo.HandlerFunc) echo.HandlerFunc {
@@ -30,7 +34,7 @@ func (u *onlyMiddleware) OnlyUsers(next echo.HandlerFunc) echo.HandlerFunc {
 			return echo.NewHTTPError(http.StatusUnauthorized, "Token not valid")
 		}
 
-		email, err := utils.ValidateToken(token[7:])
+		email, err := u.jwt.ValidateToken(token[7:])
 		if err != nil {
 			return echo.NewHTTPError(http.StatusUnauthorized, err.Error())
 		}
