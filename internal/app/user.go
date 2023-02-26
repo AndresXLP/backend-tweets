@@ -23,14 +23,18 @@ func NewUserApp(userRepo repo.Repository) User {
 }
 
 func (app *user) CreateUser(ctx context.Context, newUser dto.NewUser) error {
-	entityUser, _ := app.userRepo.GetUser(ctx, newUser.Email)
+	entityUser, err := app.userRepo.GetUser(ctx, newUser.Email)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+
 	if entityUser.ID != 0 {
 		return echo.NewHTTPError(http.StatusConflict, "this email already register")
 	}
 
 	var userModel models.User
 	userModel.BuildModel(newUser)
-	if err := app.userRepo.CreateUser(ctx, userModel); err != nil {
+	if err = app.userRepo.CreateUser(ctx, userModel); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
